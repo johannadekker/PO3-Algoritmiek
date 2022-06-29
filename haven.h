@@ -128,15 +128,20 @@ class Haven
     double ogOpKosten;
     double bgOpKosten;
 
-
+/* Ingelezen parameters */
     int breedteHaven;
     int aantalContainers;
     int lengtes[MaxN];
     int vasteRuimte;
-    double rijKosten;
+    double rijKostenConstante;
     int aantalKranen;
-    double operationeleKosten[MaxN][MaxK];
+    double operationeleKosten[MaxK][MaxN];
+
+/* Toegevoegde variabelen */
     bool haveHaven;
+    int containerCombinaties[MaxN][MaxN];
+    double rijKosten[MaxN][MaxN];
+    double kraanKosten;
 
   private:
 
@@ -147,14 +152,14 @@ class Haven
   en met j
     - als er aan het eind van een rij nog δ ruimte over is,
     dan bedragen de rijkosten c · δ2 voor een constante c*/
-  double rijKostenBerekenen(int aantalContainers, int lengtes[], int vasteRuimte,
+  void rijKostenBerekenen(int aantalContainers, int lengtes[], int vasteRuimte,
     int rijKosten, int breedteHaven);
 
   /* Berekent voor elke k met 1 <= k <= K en voor elke i en j
   met 1 <= i <= j <= N de waarde kraankosten (k, i, j): de
   totale operationele kosten voor kraan k om containers i tot
   en met j op hun plaats te zetten */
-  double kraanKostenBerekenen();
+  double kraanKostenBerekenen(int c1, int c2, int kraan);
 
   /* Berekent de totaalkosten(k,j), welke de minimale kosten
   zijn om met kranen 1 tot en met k containers 1 tot en met j
