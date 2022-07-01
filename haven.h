@@ -145,6 +145,8 @@ class Haven
 
   private:
 
+    int eersteContainers[MaxN];
+
   void containerPlaatsenRij();
 
   /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
