@@ -117,7 +117,7 @@ void Haven::drukAfInstantie () {
 double Haven::bepaalMinKostenRec (int aantalContainers)
 {
   double minKosten = 0.0;
-  int k = aantalKranen; //welke kraan is als laatste ingezet
+  int k = 1; //welke kraan is als laatste ingezet
   int r = 0; //hoe veel rijen gebruiken we
   int c = aantalContainers;
   //kosten plaatsen eerste container
@@ -135,18 +135,18 @@ double Haven::bepaalMinKostenRec (int aantalContainers)
           double k2 = rijKostNieuweRij + operatKostenHuidigeKraan;
           double k3 = rijKostNieuweRij + operatKostVolgendeKraan;
           if (k1 <= k2 && k1 <= k3) { //aansluiten is goedkoper dan nieuwe rij
-            minKosten = bepaalMinKostenRec(j-1) - rijKosten[i][j-1] + k1;
+            minKosten = bepaalMinKostenRec(j+1) - rijKosten[i][j-1] + k1;
             c--;
           } // oude rijKosten aftrekken  omdat je aansluit.
           else if (k1 > k2 && k3 > k2) { //nieuwe rij bedienen met de huidige kraan
-            minKosten = bepaalMinKostenRec(j-1) + k2;
+            minKosten = bepaalMinKostenRec(j+1) + k2;
             r++;
             c--;
             eersteContainers[r] = j;
             kraanRij[r] = k;
           } //end else if1
           else if (k1 > k3 && k2 > k3) { //nieuwe rij met nieuwe kraan
-            minKosten = bepaalMinKostenRec(j-1) + k3;
+            minKosten = bepaalMinKostenRec(j+1) + k3;
             r++;
             k++;
             c++;
