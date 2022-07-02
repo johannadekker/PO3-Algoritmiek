@@ -138,14 +138,39 @@ double Haven::bepaalMinKostenTD ()
 
 double Haven::bepaalMinKostenBU (vector<pair <int,int> > &plaatsing)
 {
+    if (kanContainerInRijPlaatsen(plaatsing)) {
+        int geplaatsteContainers = 0;
+        int containersInRij = 0;
+        int winstRuimteRij1;
+        int winstRuimterij2;
 
-// TODO: implementeer deze memberfunctie
+        int rijKostenHuidigeRij = rijKostenRaw(geplaatsteContainers, geplaatsteContainers + containersInRij); // rijkoste nvan het huidige rij
+        int rijKostenExtraContainer = rijKostenHuidigeRij + vasteRuimte + lengtes[geplaatsteContainers];// rijkosten als we een container erbij toevoegen
+        winstRuimteRij1 = (rijKostenHuidigeRij * rijKostenHuidigeRij - rijKostenExtraContainer * rijKostenExtraContainer) * rijKostenConstante;// de lege ruimte in een rij
 
-  return 0.0;
+    }
+
+
+    return 0.0;
 
 }  // bepaalMinKostenBU
 
 //*************************************************************************
+
+bool Haven::kanContainerInRijPlaatsen(vector<pair <int,int>> plaatsing) {
+    int totaleAantalContainers = 0;
+    int huidigeRijContainers = 0;
+    for (vector<pair <int,int>>::iterator it = plaatsing.begin(); it < plaatsing.end(); it++)
+    {
+        pair<int, int>  containersKraanPaar = *it; // de eerst int is de kraan en de tweede het aantal containers in de rij
+        huidigeRijContainers = containersKraanPaar.second; // pak alle containers die nu in de huidige rij staan.
+        totaleAantalContainers += huidigeRijContainers; //de som van de huidige containers
+    }
+
+    int kosten = rijKostenRaw(totaleAantalContainers - huidigeRijContainers, aantalContainers);
+    return breedteHaven - kosten - huidigeRijContainers * vasteRuimte - lengtes[totaleAantalContainers] >= 0;
+    //berekn de huidige kosten van de huidige rij om te weten of de container erbij geplaatst mag worden. 
+}
 
 void Haven::drukAfPlaatsing (vector<pair <int,int> > &plaatsing)
 {
@@ -218,6 +243,19 @@ double Haven::kraanKostenBerekenen(int c1, int c2, int kraan) {
 } //end kraanKostenBerekenen
 
 //*************************************************************************
+
+int Haven::rijKostenRaw(int startContainer, int aantalContainers) {
+    int totaleContainerlengte = 0; 
+    for (int container = startContainer; container < startContainer + aantalContainers; container++)
+    {
+        totaleContainerlengte += lengtes[container];
+    }
+
+    int kosten = breedteHaven - totaleContainerlengte;
+    return kosten;
+
+}
+
 
 /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
   rijkosten(i,j): de rijkosten bestaande uit containers i tot

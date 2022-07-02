@@ -155,6 +155,8 @@ class Haven
   void rijKostenBerekenen(int aantalContainers, int lengtes[], int vasteRuimte,
     int rijKosten, int breedteHaven);
 
+  int rijKostenRaw(int startContainers, int aantalContainers);
+  bool kanContainerInRijPlaatsen(vector<pair <int,int>> plaatsing)
   /* Berekent voor elke k met 1 <= k <= K en voor elke i en j
   met 1 <= i <= j <= N de waarde kraankosten (k, i, j): de
   totale operationele kosten voor kraan k om containers i tot
