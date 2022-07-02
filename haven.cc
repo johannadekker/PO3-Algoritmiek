@@ -118,130 +118,56 @@ double Haven::bepaalMinKostenRec (int aantalContainers)
 {
   double minKosten = 0.0;
   int k = aantalKranen; //welke kraan is als laatste ingezet
-  int c = 0; // laatste container
   int r = 0; //hoe veel rijen gebruiken we
+  int c = aantalContainers;
   //kosten plaatsen eerste container
-  if (j == 0) {
-    minKosten = rijKosten[0][0] + kraanKostenBerekenen(1, 1, 1);
-    return minKosten;
-  }
-  else {
-    for (int i = 0; i < aantalContainers; i++ )
+  if (haveHaven == true){
+    for (int i = 0; i < aantalContainers; i++ ) {
       for (int j = 1; j < aantalContainers; j++) {
         if (containerCombinaties[i][j] == 1) {
-          double rijKostNieuweRij = rijKosten[j][j]
-          double rijKostAansluiten = rijKosten[i][j]
+          double rijKostNieuweRij = rijKosten[j][j];
+          double rijKostAansluiten = rijKosten[i][j];
           //wil ik alleen voor de huidige container of voor de rest van alle
           //containers de operationele kosten weten?
-          double operatKostenHuidigeKraan = kraanKostenBerekenen(j+1, aantalContainers, k)
-          double operatKostVolgendeKraan = kraanKostenBerekenen(j+1, aantalContainers, k+1)
-
+          double operatKostenHuidigeKraan = kraanKostenBerekenen(j+1, aantalContainers, k);
+          double operatKostVolgendeKraan = kraanKostenBerekenen(j+1, aantalContainers, k+1);
           double k1 = rijKostAansluiten + operatKostenHuidigeKraan;
           double k2 = rijKostNieuweRij + operatKostenHuidigeKraan;
           double k3 = rijKostNieuweRij + operatKostVolgendeKraan;
-          if (k1 < k2 && k1 < k3) { //aansluiten is goedkoper dan nieuwe rij
-            minKosten = bepaalMinKostenRec(j-1) + k1;
-          }
+          if (k1 <= k2 && k1 <= k3) { //aansluiten is goedkoper dan nieuwe rij
+            minKosten = bepaalMinKostenRec(j-1) - rijKosten[i][j-1] + k1;
+            c--;
+          } // oude rijKosten aftrekken  omdat je aansluit.
           else if (k1 > k2 && k3 > k2) { //nieuwe rij bedienen met de huidige kraan
             minKosten = bepaalMinKostenRec(j-1) + k2;
             r++;
+            c--;
             eersteContainers[r] = j;
-          }
-          else (k1 > k3 && k2 > k3) { //nieuwe rij met nieuwe kraan
+            kraanRij[r] = k;
+          } //end else if1
+          else if (k1 > k3 && k2 > k3) { //nieuwe rij met nieuwe kraan
             minKosten = bepaalMinKostenRec(j-1) + k3;
             r++;
             k++;
+            c++;
             eersteContainers[r] = j;
+            kraanRij[r] = k;
             //ergens opslaan dat deze kraan wordt gebruikt vanaf deze rij
-          }
-        }
-        else {
-          b//denk de i en j loops omgooien
-        }
-      }
-
-        double totaalKostenDezeRij = rijKosten[i][j] + kraanKostenBerekenen(j+1, j+1, k);
-        double totaalKostenVolgendeRijSK = rijKosten[i+1][j] + kraanKostenBerekenen(j+1, j+1, k);
-        double totaalKostenVolgendeRijAK = rijKosten[i+1][j] + kraanKostenBerekenen(j+1, j+1, k+1)
-        if (totaalKostenDezeRij < totaalKostenVolgendeRijSK && totaalKostenDezeRij < totaalKostenVolgendeRijAK) {
-          minKosten = bepaalMinKostenRec(j-1) +
-        }
-    }
-  }
-
-
-
-  else {
-    for (int i = 0; i < aantalContainers; i++) {
-      for (int j = 1; j < aantalContainers; j++) {
-        /* Als de totaalkosten lager zijn wanneer de container in de volgende
-        rij wordt geplaatst, beginnen we een nieuwe rij */
-        double totaalKostenDezeRij = rijKosten[i][j] + kraanKostenBerekenen(1, j+1, k);
-        double totaalKostenVolgendeRij = rijKosten[i+1][j] + kraanKostenBerekenen(1, j+1, k);
-        if (totaalKostenDezeRij > totaalKostenVolgendeRij) {
-          r++;
-          eersteContainers[i] =j; //en voegen we die container toe aan de lijst
-          /* Indien we dus een nieuwe rij gaan gebruiken, moeten we bepalen
-          of we dan de volgende kraan willen inzetten. Dit wordt dus alleen
-          uitgevoerd bij het beginnen van een nieuwe rij. */
-          double totaalKostenDezeKraan = rijKosten[i+1][j] + kraanKostenBerekenen(1, j, k)
-          + kraanKostenBerekenen(j+1, aantalContainers, k);
-          double totaalKostenVolgendeKraan = rijKosten[i+1][j] + kraanKostenBerekenen(1, j, k)
-          + kraanKostenBerekenen(j+1, aantalContainers, k+1)
-          if (totaalKostenDezeKraan > totaalKostenVolgendeKraan) {
-            k++;
-            containerCombinaties[r][aantalContainers] = k;
-            minKosten = bepaalMinKostenRec(j-1) + rijKosten[i+1][j] + kraanKostenBerekenen(1, j+1, k)  ;
-          }//end if2
-          //Gebruiken dezelfde kraan
-          else {
-            minKosten = bepaalMinKostenRec(j-1) + totaalKostenDezeKraan;
-          } //end else
-        //Blijven op dezelfde rij
-        }
-        else {
-          minKosten = bepaalMinKostenRec(j-1) + totaal
+          }//end else if2
+        }//end if 2
+        else { //geen geldige plaatsing meer mogelijk in de bekeken rij
+          break;
         } //end else
-
-
-        }//end if1
-      }//end for2
-    }//end for1
-  } //end bepaalMinKostenRec
-
-
-
-  int k = aantalKranen - 1; //worst case: gebruik alle kranen, gebruik een kraan niet als de vorige goedkoper is
-  int j = aantalContainers - 1; //aantal rijen
-  if (int k == 0 && int j == 0) {
-        minKosten = rijKosten[0][0] + kraanKostenBerekenen(1, 1, 1);
-  }
-  else {
-      for (j; j > 0; j--){ //hier nog een check mss?
-        if (bepaalMinKostenRec(k - 1) <= bepaalMinKostenRec(k)) {//als de vorige kraan goedkoper is
-          k--; //dan willen we de laatste kraan niet gebruiken
-          minKosten = rijKosten[aantalContainers-1][j] + //deze klopt niet
-          kraanKostenBerekenen(j-1,j,k) + bepaalMinKostenRec(k-1);
-        else { //dus de vorige kraan was DUURDER, container j gaat op een nieuwe rij
-          minKosten = rijKosten[j][j] + kraanKostenBerekenen
-        }
-          /* Je weet al waar welke containers kunnen komen. Om de minimale kosten
-          te bepalen, moet je alleen nog kiezen welke kraan je wilt gebruiken.
-          - een nieuwe kraan gebruiken = nieuwe rij containers beginnen
-          - je begint bij de worst case: laatste kraan wordt gebruikt om de
-            laatste container alleen op een rij te plaatsen
-
-          De vraag is: is het goedkoper om de laatste kraan te gebruiken (k),
-          of de kraan daarvoor (k-1).
-          - als je de laatste kraan wilt gebruiken
-          Als de minimale kosten */
-        }
-      }
-    }
-  }
+      }// end for2
+    }//end for 1
+  }//end else1
+  if (c == 1) {
+    minKosten = rijKosten[0][0] + kraanKostenBerekenen(1, 1, 1);
+    return minKosten;
+  } //end if1
 // TODO: implementeer deze memberfunctie
 
-  return 0.0;
+  return minKosten;
 
 }  // bepaalMinKostenRec
 

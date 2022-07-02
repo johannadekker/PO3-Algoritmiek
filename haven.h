@@ -80,7 +80,7 @@ class Haven
     // * Als er al een instantie is: de minimale kosten voor
     //   het plaatsen van de containers.
     // * Als er nog geen instantie is: een passende default waarde.
-    double bepaalMinKostenRec ();
+    double bepaalMinKostenRec (int aantalContainers);
 
     // Bepaal met top-down dynamisch programmeren de minimale totale kosten
     // voor het plaatsen van de containers uit de instantie.
@@ -146,6 +146,7 @@ class Haven
   private:
 
     int eersteContainers[MaxN];
+    int kraanRij[MaxK];
 
   void containerPlaatsenRij();
 
