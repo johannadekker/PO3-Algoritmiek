@@ -114,62 +114,50 @@ void Haven::drukAfInstantie () {
 
 //*************************************************************************
 
-double Haven::bepaalMinKostenRec (int aantalContainers)
-{
-  double minKosten = 0.0;
-  int k = 1; //welke kraan is als laatste ingezet
-  int r = 0; //hoe veel rijen gebruiken we
-  int c = aantalContainers;
-  //kosten plaatsen eerste container
-  if (haveHaven == true){
-    for (int i = 0; i < aantalContainers; i++ ) {
-      for (int j = 1; j < aantalContainers; j++) {
-        if (containerCombinaties[i][j] == 1) {
-          double rijKostNieuweRij = rijKosten[j][j];
-          double rijKostAansluiten = rijKosten[i][j];
-          //wil ik alleen voor de huidige container of voor de rest van alle
-          //containers de operationele kosten weten?
-          double operatKostenHuidigeKraan = kraanKostenBerekenen(j+1, aantalContainers, k);
-          double operatKostVolgendeKraan = kraanKostenBerekenen(j+1, aantalContainers, k+1);
-          double k1 = rijKostAansluiten + operatKostenHuidigeKraan;
-          double k2 = rijKostNieuweRij + operatKostenHuidigeKraan;
-          double k3 = rijKostNieuweRij + operatKostVolgendeKraan;
-          if (k1 <= k2 && k1 <= k3) { //aansluiten is goedkoper dan nieuwe rij
-            minKosten = bepaalMinKostenRec(j+1) - rijKosten[i][j-1] + k1;
-            c--;
-          } // oude rijKosten aftrekken  omdat je aansluit.
-          else if (k1 > k2 && k3 > k2) { //nieuwe rij bedienen met de huidige kraan
-            minKosten = bepaalMinKostenRec(j+1) + k2;
+double Haven::bepaalMinKostenRec (int aantalContainers) {
+  int r = 0; //bijhouden hoe veel rijen je gebruikt
+  int k = aantalKranen; //bijhouden welke kraan als laatste wordt ingezet
+  for (int c = aantalContainers; c >=0; c--) {
+    double nieuweKraan = kraanKostenBerekenen(c-1, c, k);
+    double zelfdeKraan = kraanKostenBerekenen(aantalContainers-1, aantalContainers, k-1);
+    if (c == 0) {
+      return 0;
+    }//end if1
+    if (c == 1) {
+      return bepaalMinKostenRec(c-1) + kraanKostenBerekenen(1,1,1);
+    }//end if2
+    else {
+      for (int i = 0; i < aantalContainers; i++) { //loop door alle mogelijkheden van een kolom door
+        while (c >= 2) {//containerCombinations[0][-1] is niet gedefinieerd
+          //Als de container kan aansluiten in een vorige rij
+          if (containerCombinaties[i][c - 1] == 1) {
+            //Dan begin je alleen een nieuwe rij als de rijkosten voor die container
+            //alleen plaatsen kleiner zijn dan de kosten van dezelfde kraan gebruiken
+            if (zelfdeKraan > rijKosten[i][c-2] + nieuweKraan) {
+              return bepaalMinKostenRec(c-1) + nieuweKraan + rijKosten[i][c-2];
+              r++;
+              //Voeg alleen de rijkosten toe van de rij ervoor wanneer je een nieuwe rij begint
+            } //end if4
+            else {
+              return bepaalMinKostenRec(c-1) + zelfdeKraan;
+            } //end else2
+          }//end if
+          //Als de container op een nieuwe rij moet
+          else {
             r++;
-            c--;
-            eersteContainers[r] = j;
-            kraanRij[r] = k;
-          } //end else if1
-          else if (k1 > k3 && k2 > k3) { //nieuwe rij met nieuwe kraan
-            minKosten = bepaalMinKostenRec(j+1) + k3;
-            r++;
-            k++;
-            c++;
-            eersteContainers[r] = j;
-            kraanRij[r] = k;
-            //ergens opslaan dat deze kraan wordt gebruikt vanaf deze rij
-          }//end else if2
-        }//end if 2
-        else { //geen geldige plaatsing meer mogelijk in de bekeken rij
-          break;
-        } //end else
-      }// end for2
-    }//end for 1
-  }//end else1
-  if (c == 1) {
-    minKosten = rijKosten[0][0] + kraanKostenBerekenen(1, 1, 1);
-    return minKosten;
-  } //end if1
-// TODO: implementeer deze memberfunctie
-
-  return minKosten;
-
-}  // bepaalMinKostenRec
+            if (nieuweKraan < zelfdeKraan) { //goedkoper om een nieuwe kraan te gebruiken
+              return bepaalMinKostenRec(aantalContainers-1) + nieuweKraan; //laatste rij heeft geen rijkosten
+            } //end else if
+            if (zelfdeKraan <= nieuweKraan) { //geen verschil
+              return bepaalMinKostenRec(aantalContainers-1) + zelfdeKraan;
+            } //end else if
+          } //end while
+        }//end for2
+      }//end else1
+    }//end for
+  //De container MOET op een nieuwe rij
+  } //end else1
+}
 
 //*************************************************************************
 

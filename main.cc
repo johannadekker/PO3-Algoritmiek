@@ -71,7 +71,7 @@ void menuVoorInstantie (Haven *h1)
     t1 = clock ();
     cout << endl;
     switch (keuze)
-    { case 1: kosten = h1 -> bepaalMinKostenRec ();
+    { case 1: kosten = h1 -> bepaalMinKostenRec (aantalContainers);
               cout << "Minimale kosten zijn: " << kosten << endl;
               break;
       case 2: kosten = h1 -> bepaalMinKostenTD ();
@@ -100,7 +100,7 @@ void menuVoorInstantie (Haven *h1)
 // Voer de experimenten uit, zoals beschreven in de opdracht.
 void doeExperimenten ()
 { int keuze;
- 
+
   keuze = 0;
   while (keuze!=4)
   {
@@ -154,11 +154,10 @@ void hoofdmenu ()
 }  // hoofdmenu
 
 //*************************************************************************
-  
+
 int main ()
 {
   hoofdmenu ();
-
   return 0;
 
 }
