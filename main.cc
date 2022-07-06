@@ -100,7 +100,7 @@ void menuVoorInstantie (Haven *h1)
 // Voer de experimenten uit, zoals beschreven in de opdracht.
 void doeExperimenten ()
 { int keuze;
- 
+
   keuze = 0;
   while (keuze!=4)
   {
@@ -154,7 +154,7 @@ void hoofdmenu ()
 }  // hoofdmenu
 
 //*************************************************************************
-  
+
 int main ()
 {
   hoofdmenu ();
