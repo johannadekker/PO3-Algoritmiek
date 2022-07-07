@@ -117,68 +117,75 @@ void Haven::drukAfInstantie () {
 
 double Haven::bepaalMinKostenRec ()
 {
-  if (aantalContainers == 1) {
-    int laatsteKeuze = 0;
-    double minKosten = 0.0;
-    double lengteContainersRij = 0.0;
-    int teller = 0;
+  if (aantalContainers == 1 ) { 
     double min = 10.1; //maximale operationeleKosten zijn 10.0
-    for (int k = laatsteKeuze; k < aantalKranen; k++) {
-      if (operationeleKosten[k][0] < min)
+    for (int k = 0; k < aantalKranen; k++) {
+      if (operationeleKosten[k][0] < min) {
         minKosten = operationeleKosten[k][0];
-        lengteContainersRij += lengtes[0];
+        lengteContainersRij = lengtes[0];
         laatsteKeuze = k;
+        rijkosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
+        break;
       }
     }
-    else if (aantalContainers > 1) {
-      while (aantalContainers != 1) //niks is bepaald
-        aantalContainers--;
-        cout << "test1" << endl;
-        teller++;
-        bepaalMinKostenRec();
+    aantalContainers++;
+    bepaalMinKostenRec();
+  }
+  if (minKosten > 0 && lengtes[aantalContainers-1] != 0) {
+    int j = aantalContainers-1;
+    //eerste check: kan aansluiten?
+    if (lengtes[j]+lengteContainersRij+vasteRuimte <= breedteHaven) {
+      double min = operationeleKosten[laatsteKeuze][j];
+      rijkosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
+      //kijk of een hogere kraan inzetten en de gemaakte rijkosten goedkoper is
+      //dan aansluiten
+      if (laatsteKeuze + 1 == aantalKranen) {
+        minKosten += min;
       }
-    else if (laatsteKeuze > 0 && minKosten > 0.0) { //eerste is bepaald
-      aantalContainers++; //kijk naar volgende containers
-      for (int j = aantalContainers; j <= teller; j++) {
-        int rijKosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
-        cout << "rijkosten " << j << rijKosten << endl;
-        if (lengtes[j-1]+lengteContainersRij+vasteRuimte <= breedteHaven){
-          double min = operationeleKosten[laatsteKeuze][j-1];
-          //kijk of een hogere kraan inzetten en de gemaakte rijkosten goedkoper is
-          //dan aansluiten
-          for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
-            if (operationeleKosten[k][j-1] + rijKosten < min) {
-              minKosten += operationeleKosten[k][0] + rijKosten;
-              lengteContainersRij = 0 + lengtes[j-1];
+      for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
+          if (operationeleKosten[k][j] + rijkosten < min) {
+            minKosten += operationeleKosten[k][j] + rijkosten;
+            lengteContainersRij = 0 + lengtes[j];
+            laatsteKeuze = k;
+            break;
+          }
+          else {
+            minKosten += min;
+            lengteContainersRij += lengtes[j] + vasteRuimte;
+            break;
+          } // end else
+        } //end for
+      }//end if
+      else { //kan niet aansluiten
+        rijkosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
+        minKosten += rijkosten;
+        lengteContainersRij = lengtes[j];
+        double min = operationeleKosten[laatsteKeuze][j]; //min is laatste ingezette kraan gebruiken
+        if (laatsteKeuze + 1 == aantalKranen) {
+          minKosten += min;
+        }
+        for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
+          if (operationeleKosten[k][j] < min) {
+              min = operationeleKosten[k][j];
+              minKosten += min; //tel de rijKosten op;
               laatsteKeuze = k;
-            }
-            else {
-              minKosten += min;
-              lengteContainersRij += lengtes[j] + vasteRuimte;
-            } // end else
-          } //end for
-        }//end if
-        else { //kan niet aansluiten
-            lengteContainersRij = 0 + lengtes[j-1];
-            minKosten += rijKosten; //tel de rijKosten op
-            double min = operationeleKosten[laatsteKeuze][j-1]; //min is laatste ingezette kraan gebruiken
-            //is een hogere kraan goedkoper?
-            for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
-              if (operationeleKosten[k][j-1] < min) {
-                minKosten += operationeleKosten[k][j-1];
-                laatsteKeuze = k;
-              }
-              else {
-                minKosten += min;
-              }
-            }//end for
-          } //end else
-          aantalContainers++;
-          bepaalMinKostenRec();
-        }//end loop containers;
-      }
-  if (minKosten > 0){
-    return minKosten;
+          }
+          else {
+            minKosten += min;
+            break;
+          }
+        }//end for
+      } //end else
+      aantalContainers++;
+      bepaalMinKostenRec();
+      return (minKosten - rijkosten);
+      //end loop containers;
+    }
+  if (aantalContainers > 1) {
+    while (minKosten == 0) {//niks is bepaald
+      aantalContainers--;
+      bepaalMinKostenRec();
+    }
   }
 }  // bepaalMinKostenRec
 

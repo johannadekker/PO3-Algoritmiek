@@ -144,9 +144,13 @@ class Haven
     int containerCombinaties[MaxN][MaxN];
     double rijKosten[MaxN][MaxN];
     double kraanKosten;
+    double minKosten = 0;
+    int lengteContainersRij;
+    int laatsteKeuze;
+    int rijkosten;
 
   private:
-
+  int teller;
   void containerPlaatsenRij();
 
   /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
