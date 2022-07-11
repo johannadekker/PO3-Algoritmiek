@@ -70,12 +70,40 @@ ifstream haven;
 }  // leesInInstantie
 //****************************************************************************
 
+// Genereer een instantie met waardes voor b, N, s, c en K uit
+// de parameters, met random lengtes (van de containers) tussen
+// ogLengte en bgLengte, en random operationele kosten tussen ogOpKosten
+// en bgOpKosten (og=ondergrens, bg=bovengrens).
+// Sla alles op in het object.
+// Deze functie is nodig voor het experiment in de opdracht.
+// BIJ DEZE FUNCTIE MAG JE ERVAN UITGAAN DAT DE PARAMETERS BINNEN
+// DE GRENZEN VAN DE OPDRACHT LIGGEN. JE HOEFT DAT DUS NIET TE
+// CONTROLEREN.
+// Post:
+// * De gegenereerde instantie is opgeslagen in het object.
+// * Het is ook in een membervariabele opgeslagen dat er een instantie
+//   is, waarvoor andere memberfuncties kunnen worden uitgevoerd.
+
 void Haven::genereerInstantie (int b, int N, int ogLengte, int bgLengte,
   int s, double c, int K, double ogOpKosten, double bgOpKosten)
 {
-
-// TODO: implementeer deze memberfunctie
-
+  b = randomGetal(1, INT_MAX);
+  N = randomGetal(1, 1024);
+  ogLengte = 1;
+  bgLengte = b;
+  for (int n = 0; n < N; n++) {
+    lengtes[n] = randomGetal(ogLengte, bgLengte);
+  };
+  s = randomGetal(0, INT_MAX);
+  c = randomGetal(0, INT_MAX);
+  K = randomGetal(1, 512);
+  ogOpKosten = 0;
+  bgOpKosten = 10.0;
+  for (int k = 0; k < K; k++) {
+    for (int i = 0; i < N; i++) {
+      operationeleKosten[k][i] = randomDouble(ogOpKosten, bgOpKosten);
+    }
+  }
 }  // genereerInstantie
 
 //*************************************************************************
@@ -103,22 +131,107 @@ void Haven::drukAfInstantie () {
         }
       }
     }
-    cout << endl;
-    containerPlaatsenRij ();
-    cout << endl;
-    rijKostenBerekenen(aantalContainers, lengtes, vasteRuimte, rijKostenConstante, breedteHaven);
-    cout << endl;
-    kraanKostenBerekenen(1, 5, 1);
   }
 }  // drukAfInstantie
 
 //*************************************************************************
 
-
 double Haven::bepaalMinKostenRec ()
 {
-  if (aantalContainers == 1 ) { 
+  int j = aantalContainers;
+  int laatsteKeuze = 1;
+  vector<int> rijKosten;
+  if (!haveHaven) {
+    cerr << "Er is geen instantie." << endl;
+    return 0;
+  }
+  if (aantalContainers == 0) {
+    return 0;
+  }
+  if (aantalContainers == 1 && aantalKranen == 1) {
+    j = 1;
+    laatsteKeuze = 1;
+    minKosten = kraanKostenBerekenen(1, 1, 1);
+    teller++;
+  }
+  //Vult een rij met containers op de goedkoopst mogelijke manier
+  if (aantalContainers > 1 && aantalKranen > 1) {
+    double temp = INT_MAX; int rK; double oK;
+    int eersteContainer;
+    for (int i = 1; i <= j; i++) {
+      for (int k = laatsteKeuze; k <= aantalKranen; k++) {
+        if (rijKostenBerekenen(i,j) + kraanKostenBerekenen(i, j, k) < temp) {
+          temp = rijKostenBerekenen(i, j) + kraanKostenBerekenen(i, j, k);
+          rK = rijKostenBerekenen(i, j);
+          oK = kraanKostenBerekenen(i, j, k);
+          eersteContainer = i;
+          laatsteKeuze = k;
+        }
+      }
+    }
+    minKosten += oK; rijKosten.push_back(rK); teller++;
+    aantalKranen = laatsteKeuze; aantalContainers = eersteContainer-1;
+    bepaalMinKostenRec();
+
+  /*  for (int i = j; i > 0; i--) {
+      for (int k = laatsteKeuze; k > 0; k--) {
+        if (rijKostenBerekenen(i, j) + kraanKostenBerekenen(i, j, k) < temp) {
+          temp = rijKostenBerekenen(i, j) + kraanKostenBerekenen(i, j, k);
+          eersteContainerRij = i;
+          laatsteKeuze = k;
+        }
+      }
+    }
+    minKosten += temp;
+    aantalKranen = laatsteKeuze;
+    aantalContainers = eersteContainerRij-1;
+    cout << "aantal containers is nu" << aantalContainers << endl;
+    cout << "aantal kranen is nu" << aantalKranen << endl;
+    cout << temp << endl;
+    bepaalMinKostenRec(); */
+  }
+  else if (aantalContainers > 1 && aantalKranen == 1) {
+    double temp = INT_MAX; int rK; double oK;
+    for (int i = j-1; i > 0; i--) {
+      if (rijKostenBerekenen(i,j) + kraanKostenBerekenen(i, j, 1) < temp) {
+        temp = rijKostenBerekenen(i,j) + kraanKostenBerekenen(i, j, 1);
+        rK = rijKostenBerekenen(i,j); oK = kraanKostenBerekenen(i, j, 1);
+        j = i-1;
+      }
+    }
+    minKosten += oK; rijKosten.push_back(rK); teller++;
+    bepaalMinKostenRec();
+  }
+  else if (aantalContainers == 1 && aantalKranen > 1) {
+    double temp = INT_MAX;
+    for (int k = laatsteKeuze; k > 0; k--) {
+      if (kraanKostenBerekenen(1,1,k) < temp) {
+        temp = kraanKostenBerekenen(1,1,k);
+      }
+    }
+    minKosten += temp; teller++;
+  }
+  for (auto i: rijKosten) {
+    cout <<
+  }
+  if (!rijKosten.empty()){
+    int x = rijKosten.size();
+  cout << 'x' << x << endl;}
+  cout << teller << endl;
+  return minKosten
+}  // bepaalMinKostenRec
+
+//*************************************************************************
+
+double Haven::bepaalMinKostenTD ()
+{
+  if (!haveHaven) {
+    cerr << "Er is geen instantie." << endl;
+    return 0;
+  }
+  if (aantalContainers == 1 ) {
     double min = 10.1; //maximale operationeleKosten zijn 10.0
+    //kijk naar alle kranen welke het goedkoopst is
     for (int k = 0; k < aantalKranen; k++) {
       if (operationeleKosten[k][0] < min) {
         minKosten = operationeleKosten[k][0];
@@ -129,75 +242,71 @@ double Haven::bepaalMinKostenRec ()
       }
     }
     aantalContainers++;
-    bepaalMinKostenRec();
+    bepaalMinKostenTD();
   }
+  //Als container 1 is bepaald
   if (minKosten > 0 && lengtes[aantalContainers-1] != 0) {
     int j = aantalContainers-1;
-    //eerste check: kan aansluiten?
+    //eerste check: kan volgende container aansluiten?
     if (lengtes[j]+lengteContainersRij+vasteRuimte <= breedteHaven) {
       double min = operationeleKosten[laatsteKeuze][j];
       rijkosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
+      //Als de laatste kraan is ingezet, voeg dan gewoon o_k,j toe.
+      if (laatsteKeuze + 1 == aantalKranen) {
+        minKosten += min;
+        }
+      //Nu wordt er vanaf de laatst gekozen kraan gekeken, ipv alle kranen
       //kijk of een hogere kraan inzetten en de gemaakte rijkosten goedkoper is
       //dan aansluiten
+      for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
+        if (operationeleKosten[k][j] + rijkosten < min) {
+          min = operationeleKosten[k][j] + rijkosten;
+          lengteContainersRij = 0 + lengtes[j];
+          laatsteKeuze = k;
+        }
+        //Als een hogere kraan niet goedkoper is
+        else {
+          lengteContainersRij += lengtes[j] + vasteRuimte;
+        } // end else
+        minKosten += min;
+      } //end for
+    }//end if
+    else { //kan niet aansluiten
+      rijkosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
+      minKosten += rijkosten; //Voeg rijkosten vorige rij toe bij het beginnen van een nieuwe rij
+      lengteContainersRij = lengtes[j]; //Opnieuw initializeren
+      double min = operationeleKosten[laatsteKeuze][j]; //min is laatste ingezette kraan gebruiken
+      //Indien de hoogst genummerde kraan is ingezet, voeg gewoon o_k,j toe.
       if (laatsteKeuze + 1 == aantalKranen) {
         minKosten += min;
       }
+      //Kijk anders of een hogere kraan lagere kosten oplevert
       for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
-          if (operationeleKosten[k][j] + rijkosten < min) {
-            minKosten += operationeleKosten[k][j] + rijkosten;
-            lengteContainersRij = 0 + lengtes[j];
-            laatsteKeuze = k;
-            break;
-          }
-          else {
-            minKosten += min;
-            lengteContainersRij += lengtes[j] + vasteRuimte;
-            break;
-          } // end else
-        } //end for
-      }//end if
-      else { //kan niet aansluiten
-        rijkosten = rijKostenConstante * ((breedteHaven - lengteContainersRij)*(breedteHaven - lengteContainersRij));
-        minKosten += rijkosten;
-        lengteContainersRij = lengtes[j];
-        double min = operationeleKosten[laatsteKeuze][j]; //min is laatste ingezette kraan gebruiken
-        if (laatsteKeuze + 1 == aantalKranen) {
-          minKosten += min;
+        if (operationeleKosten[k][j] < min) {
+          min = operationeleKosten[k][j];
+          minKosten += min; //tel de rijKosten op;
+          laatsteKeuze = k;
         }
-        for (int k = laatsteKeuze + 1; k < aantalKranen; k++) {
-          if (operationeleKosten[k][j] < min) {
-              min = operationeleKosten[k][j];
-              minKosten += min; //tel de rijKosten op;
-              laatsteKeuze = k;
-          }
-          else {
-            minKosten += min;
-            break;
-          }
-        }//end for
-      } //end else
-      aantalContainers++;
-      bepaalMinKostenRec();
-      return (minKosten - rijkosten);
-      //end loop containers;
-    }
+        else {
+          minKosten += min;
+          break;
+        }
+      }//end for
+    } //end else
+    //Container is geplaatst, kijk nu naar de volgende
+    aantalContainers++;
+    bepaalMinKostenTD();
+    //Laatste rij heeft geen rijkosten, dus trek de laatst berekende rijkosten af
+    return (minKosten - rijkosten);
+    //end loop containers;
+  }
+  //Als de eerste container niet is bepaald, reduceer het aantal containers
   if (aantalContainers > 1) {
     while (minKosten == 0) {//niks is bepaald
       aantalContainers--;
-      bepaalMinKostenRec();
+      bepaalMinKostenTD();
     }
   }
-}  // bepaalMinKostenRec
-
-//*************************************************************************
-
-double Haven::bepaalMinKostenTD ()
-{
-
-// TODO: implementeer deze memberfunctie
-
-  return 0.0;
-
 }  // bepaalMinKostenTD
 
 //*************************************************************************
@@ -294,16 +403,6 @@ void Haven::containerPlaatsenRij() {
       } //end else
     }//for2
   }//for1
-  /* Test cout */
-  cout << "Container Plaatsingen: " << endl;
-  for (int i = 0; i < aantalContainers; i++) {
-    for (int j = 0; j < aantalContainers; j++) {
-      cout << containerCombinaties[i][j] << ' ';
-      if (j == aantalContainers - 1) {
-        cout << endl;
-      }
-    }
-  }
 }//end functie
 
 //*************************************************************************
@@ -318,10 +417,15 @@ met j (c2) op hun plaats te zetten. Let op! Geen controles of dit geldig is.
 
 double Haven::kraanKostenBerekenen(int c1, int c2, int kraan) {
   double kraanKosten = 0.0;
-  for (int i = c1-1; i < c2; i++) { //c1-1 voor index van array
-    kraanKosten = kraanKosten + operationeleKosten[kraan-1][i];
-  } //end for
-    return kraanKosten;
+  if (c1 < 1 || c2 > aantalContainers || kraan < 1 || kraan > aantalKranen) {
+    return 10.1;
+  }
+  else {
+    for (int i = c1-1; i < c2; i++) { //c1-1 voor index van array
+      kraanKosten = kraanKosten + operationeleKosten[kraan-1][i];
+    } //end for
+      return kraanKosten;
+  }
 } //end kraanKostenBerekenen
 
 //*************************************************************************
@@ -366,38 +470,29 @@ int Haven::rijKostenRaw(int rij, vector<pair <int,int>> &plaatsing) {
     - als er aan het eind van een rij nog δ ruimte over is,
     dan bedragen de rijkosten c · δ2 voor een constante c */
 
-  void Haven::rijKostenBerekenen(int aantalContainers, int lengtes[], int vasteRuimte,
-    int rijKostenConstante, int breedteHaven) {
-    double eindruimte = 0; //Delta, ruimte aan einde van de rij
-    for (int row = 0; row < aantalContainers; row++) { //loop over rijen haven
-    double temp = 0;
-      for (int col = row; col < aantalContainers; col++) {//loop over de containers
-        if (containerCombinaties[row][col] == 1) {//als het een geldige plaatsing is
-          temp = temp + lengtes[col] + vasteRuimte; //tel lengte van de containers in de rij op
-          eindruimte = breedteHaven - temp + vasteRuimte; //trek dit van de breedteHaven af, en houd rekening met de extra getelde vaste ruimte
-          rijKosten[row][col] = rijKostenConstante * (eindruimte * eindruimte); //bereken rijKosten, sla op in array
-        }
-        else if (containerCombinaties[row][col] == 0) {//indien ongeldige plaatsing
-          rijKosten[row][col] = 0; //geen rijKosten
-          break; //en bekijk de volgende rij met containers
-        }
-        /* cout << "row @: " << row << endl;
-        cout << "col @: " << col << endl;
-        cout << "temp @: " << temp << endl;
-        cout << "lengtes[col] @: " << lengtes[col] << endl;
-        cout << "eindruimte @: " << eindruimte << endl;
-        cout << endl; */
-      }//end for2
-    }//end for1
-    cout << "Rij Kosten: " << endl;
-    for (int i = 0; i < aantalContainers; i++) {
-      for (int j = 0; j < aantalContainers; j++) {
-        cout << rijKosten[i][j] << ' ';
-        if (j == (aantalContainers - 1)) {
-          cout << endl;
-        }
-      }
-    }
-  }//end rijKostenBerekenen
+int Haven::rijKostenBerekenen(int beginContainer, int eindContainer) {
+  int containersInRij;
+  if (beginContainer == eindContainer) {
+    containersInRij = 1;
+  }
+  else {
+    containersInRij = eindContainer - beginContainer + 1;
+  }
+  int benodigeTussenRuimte = (containersInRij - 1) * vasteRuimte;
+  int totaleLengtesContainers = 0;
+  for (int i = beginContainer; i <= eindContainer; i++) {
+    totaleLengtesContainers += lengtes[i-1];
+  }
+  //Als de containers te lang zijn voor de rij
+  if (totaleLengtesContainers + benodigeTussenRuimte > breedteHaven) {
+    int maxRK = rijKostenConstante * intSquare(breedteHaven);
+    return maxRK;
+  }
+  else {
+  //Als het een geldige rij voorstelt, return rijkosten
+    int eindruimte = breedteHaven - (totaleLengtesContainers + benodigeTussenRuimte);
+    return (rijKostenConstante * square(eindruimte));
+  }
+}// end rijKostenBerekenen
 
   //*************************************************************************

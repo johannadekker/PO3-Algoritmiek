@@ -135,22 +135,24 @@ class Haven
     int vasteRuimte;
     double rijKostenConstante;
     int aantalKranen;
-    pair<int, int> cachedKraanContainerParen[MaxN];
-    int cachedRijKosten[MaxN];
-    double operationeleKosten[MaxK][MaxN];
 
 /* Toegevoegde variabelen */
     bool haveHaven;
     int containerCombinaties[MaxN][MaxN];
-    double rijKosten[MaxN][MaxN];
+    vector<int>rijKosten;
+    int laatsteRijKosten;
     double kraanKosten;
+    int teller;
     double minKosten = 0;
     int lengteContainersRij;
-    int laatsteKeuze;
+    int laatsteKeuze = 0;
     int rijkosten;
+    pair<int, int> cachedKraanContainerParen[MaxN];
+    int cachedRijKosten[MaxN];
+    double operationeleKosten[MaxK][MaxN];
+
 
   private:
-  int teller;
   void containerPlaatsenRij();
 
   /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
@@ -158,8 +160,7 @@ class Haven
   en met j
     - als er aan het eind van een rij nog δ ruimte over is,
     dan bedragen de rijkosten c · δ2 voor een constante c*/
-  void rijKostenBerekenen(int aantalContainers, int lengtes[], int vasteRuimte,
-    int rijKosten, int breedteHaven);
+  int rijKostenBerekenen(int beginContainer, int eindContainer);
 
   int rijKostenRaw(int rij, vector<pair<int, int>> &plaatsing);
   bool kanContainerInRijPlaatsen(vector<pair <int,int>> &plaatsing);
