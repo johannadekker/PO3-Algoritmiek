@@ -140,7 +140,6 @@ double Haven::bepaalMinKostenRec ()
 {
   int j = aantalContainers;
   int laatsteKeuze = 1;
-  vector<int> rijKosten;
   if (!haveHaven) {
     cerr << "Er is geen instantie." << endl;
     return 0;
@@ -152,7 +151,6 @@ double Haven::bepaalMinKostenRec ()
     j = 1;
     laatsteKeuze = 1;
     minKosten = kraanKostenBerekenen(1, 1, 1);
-    teller++;
   }
   //Vult een rij met containers op de goedkoopst mogelijke manier
   if (aantalContainers > 1 && aantalKranen > 1) {
@@ -163,43 +161,25 @@ double Haven::bepaalMinKostenRec ()
         if (rijKostenBerekenen(i,j) + kraanKostenBerekenen(i, j, k) < temp) {
           temp = rijKostenBerekenen(i, j) + kraanKostenBerekenen(i, j, k);
           rK = rijKostenBerekenen(i, j);
-          oK = kraanKostenBerekenen(i, j, k);
           eersteContainer = i;
           laatsteKeuze = k;
         }
       }
     }
-    minKosten += oK; rijKosten.push_back(rK); teller++;
+    minKosten += temp; rijKosten.push_back(rK);
     aantalKranen = laatsteKeuze; aantalContainers = eersteContainer-1;
     bepaalMinKostenRec();
-
-  /*  for (int i = j; i > 0; i--) {
-      for (int k = laatsteKeuze; k > 0; k--) {
-        if (rijKostenBerekenen(i, j) + kraanKostenBerekenen(i, j, k) < temp) {
-          temp = rijKostenBerekenen(i, j) + kraanKostenBerekenen(i, j, k);
-          eersteContainerRij = i;
-          laatsteKeuze = k;
-        }
-      }
-    }
-    minKosten += temp;
-    aantalKranen = laatsteKeuze;
-    aantalContainers = eersteContainerRij-1;
-    cout << "aantal containers is nu" << aantalContainers << endl;
-    cout << "aantal kranen is nu" << aantalKranen << endl;
-    cout << temp << endl;
-    bepaalMinKostenRec(); */
   }
   else if (aantalContainers > 1 && aantalKranen == 1) {
     double temp = INT_MAX; int rK; double oK;
     for (int i = j-1; i > 0; i--) {
       if (rijKostenBerekenen(i,j) + kraanKostenBerekenen(i, j, 1) < temp) {
         temp = rijKostenBerekenen(i,j) + kraanKostenBerekenen(i, j, 1);
-        rK = rijKostenBerekenen(i,j); oK = kraanKostenBerekenen(i, j, 1);
+        rK = rijKostenBerekenen(i,j);
         j = i-1;
       }
     }
-    minKosten += oK; rijKosten.push_back(rK); teller++;
+    minKosten += temp; rijKosten.push_back(rK); teller++;
     bepaalMinKostenRec();
   }
   else if (aantalContainers == 1 && aantalKranen > 1) {
@@ -209,16 +189,9 @@ double Haven::bepaalMinKostenRec ()
         temp = kraanKostenBerekenen(1,1,k);
       }
     }
-    minKosten += temp; teller++;
+    minKosten += temp;
   }
-  for (auto i: rijKosten) {
-    cout <<
-  }
-  if (!rijKosten.empty()){
-    int x = rijKosten.size();
-  cout << 'x' << x << endl;}
-  cout << teller << endl;
-  return minKosten
+  return minKosten - rijKosten[0];
 }  // bepaalMinKostenRec
 
 //*************************************************************************
