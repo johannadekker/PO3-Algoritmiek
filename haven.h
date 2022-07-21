@@ -128,32 +128,38 @@ class Haven
     double ogOpKosten;
     double bgOpKosten;
 
-/* Ingelezen parameters */
-    int breedteHaven;
-    int aantalContainers;
-    int lengtes[MaxN];
-    int vasteRuimte;
-    double rijKostenConstante;
-    int aantalKranen;
 
-/* Toegevoegde variabelen */
-    bool haveHaven;
-    int containerCombinaties[MaxN][MaxN];
-    vector<int>rijKosten;
-    int laatsteRijKosten;
-    double kraanKosten;
-    int teller;
-    double minKosten = 0;
-    int lengteContainersRij;
-    int laatsteKeuze = 0;
-    int rijkosten;
-    pair<int, int> cachedKraanContainerParen[MaxN];
-    int cachedRijKosten[MaxN];
-    double operationeleKosten[MaxK][MaxN];
 
 
   private:
-  void containerPlaatsenRij();
+/* Ingelezen parameters */
+      int breedteHaven;
+      int aantalContainers;
+      int lengte[MaxN];
+      int vasteRuimte;
+      double rijKostenConstante;
+      int aantalKranen;
+      double operationeleKosten[MaxK][MaxN];
+
+  /* Toegevoegde variabelen */
+        bool haveHaven;
+        int eindruimte;
+        int eindContainer;
+        int containerCombinaties[MaxN][MaxN];
+        vector<int>rijKosten;
+        int laatsteRijKosten;
+        double kraanKosten;
+        int teller;
+        double kosten = 0;
+        double minKosten;
+        int lengteContainersRij;
+        int keuze = 0;
+        pair<int, int> cachedKraanContainerParen[MaxN];
+        int cachedRijKosten[MaxN];
+
+  /* Geeft de begincontainer bij de eindcontainer */
+  double recStartRij(int j, int k);
+  double recHalverwegeRij(int i, int j, int k);
 
   /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
   rijkosten(i,j): de rijkosten bestaande uit containers i tot
@@ -188,10 +194,13 @@ class Haven
     van de oplossing staan. Wat zijn de totale kosten bij elke
     mogelijkheid?
    */
-  double totaalKostenBerekenen();
+  double totaalKosten(int k, int j);
 
 
-
+  double reccRoel();
+  double reccRoelStartRij(int j, int k);
+  double reccRoelHalverwegeRij(int j, int k, int delta);
+  void containerPlaatsenRij();
 
 
 // TODO: uw eigen private memberfuncties en membervariabelen
