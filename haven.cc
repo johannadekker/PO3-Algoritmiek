@@ -96,20 +96,21 @@ void Haven::genereerInstantie (int b, int N, int ogLengte, int bgLengte,
 
 void Haven::drukAfInstantie () {
   if (haveHaven == true) {
-    cout <<"Breedte haven: " << breedteHaven << endl;
-    cout << "Aantal containers: " << aantalContainers << endl;
-    cout << "Lengte: ";
-    for (int l = 0; l < aantalContainers; l++){
-      cout << lengte[l] << ' ';}
+    cout <<"b = " << breedteHaven << endl;
+    cout << "N = " << aantalContainers << endl;
+    cout << "lengte[] = {";
+    for (int i = 0; i < aantalContainers; i++){
+      cout << lengte[i] << "}";
+    }
     cout << endl;
-    cout << "Vaste ruimte: " << vasteRuimte << endl;
+    cout << "s = " << vasteRuimte << endl;
     cout << "c = " << rijKostenConstante << endl;
-    cout << "Aantal Kranen: " << aantalKranen << endl;
-    cout << "Operationele kosten: " << endl;
-    for (int row = 0; row < aantalKranen; row++) {
-      for (int col = 0; col < aantalContainers; col++) {
-        cout << operationeleKosten[row][col] << ' ';
-        if (col == aantalContainers-1) {
+    cout << "K = " << aantalKranen << endl;
+    cout << "opKosten[k][j] =" << endl;
+    for (int k = 0; k < aantalKranen; k++) {
+      for (int j = 0; j < aantalContainers; j++) {
+        cout << operationeleKosten[k][j] << ' ';
+        if (j == aantalContainers-1) {
           cout << endl;
         }
       }
@@ -118,8 +119,8 @@ void Haven::drukAfInstantie () {
 }  // drukAfInstantie
 
 //*************************************************************************
-/* Roept de recursieve hulpfunctie recStartRij(j,k) aan met (0,0). Retourtneert
-de waarde totaalkosten(aantalKranen, aantalContainers) */
+/*  Retourtneert de waarde totaalkosten(aantalKranen, aantalContainers).
+Roept de recursieve hulpfunctie recStartRij(j,k) aan met (0,0). */
 
 double Haven::bepaalMinKostenRec ()
 { //Controle of er een instantie is
