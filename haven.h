@@ -128,9 +128,6 @@ class Haven
     double ogOpKosten;
     double bgOpKosten;
 
-
-
-
   private:
 /* Ingelezen parameters */
       int breedteHaven;
@@ -143,67 +140,43 @@ class Haven
 
   /* Toegevoegde variabelen */
         bool haveHaven;
-        int eindruimte;
-        int eindContainer;
-        int containerCombinaties[MaxN][MaxN];
-        vector<int>rijKosten;
-        int laatsteRijKosten;
-        double kraanKosten;
-        int teller;
-        double kosten = 0;
-        double minKosten;
-        int lengteContainersRij;
-        int keuze = 0;
         pair<int, int> cachedKraanContainerParen[MaxN];
         int cachedRijKosten[MaxN];
 
-  /* Geeft de begincontainer bij de eindcontainer */
+  /* Retourneert de waarde rijkosten(i,j): de rijkosten voor een rij bestaande uit
+  containers i tot en met j
+  - rijkosten = c · δ^2, waarbij δ de ruimte is over aan het eind van een rij en
+    c een ingelezen parameter
+  -  1 <= i <= j <= aantalContainers. i = 0 -> container 1
+  - i en j zijn geldig van 0 tot aantalContainers - 1, gebruiken indexposities
+  - ongeldige rijen returnen INT_MAX, i.e. te breed  */
+  int rijKosten(int i, int j);
+
+  /* Retourneert de totale operationele kosten voor kraan k om containers i tot en
+  met j op hun plaats te zetten.
+    - 0 <= k < aantalKranen
+    - bij ongeldige invoer returnt hij INT_MAX, i.e. kraan -1  */
+  double kraanKosten(int i, int j, int k);
+
+  /* Een recursieve hulpfunctie die de totaalkosten(k,j) retourneert voor een
+  container die als eerste op een rij wordt geplaatst. Evalueert twee keuzes:
+  container plaatsen met de huidige kraan, of met een hoger genummerde kraan
+  indien beschikbaar.
+  - 0 <= j < aantalContainers
+  - 0 <= k < aantalKranen */
   double recStartRij(int j, int k);
+
+  /* Een recursieve hulpfunctie die de totaalkosten(k,j) retourneert voor een
+  container wanneer er al een container op de huidige rij staat. Evalueert twee
+  keuzes: aansluiten bij huidige rij, of een nieuwe rij beginnen.
+  - 0 <= i <= j < aantalContainers
+  - 0 <= k < aantalKranen     */
   double recHalverwegeRij(int i, int j, int k);
 
-  /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
-  rijkosten(i,j): de rijkosten bestaande uit containers i tot
-  en met j
-    - als er aan het eind van een rij nog δ ruimte over is,
-    dan bedragen de rijkosten c · δ2 voor een constante c*/
-  int rijKostenBerekenen(int beginContainer, int eindContainer);
+
 
   int rijKostenRaw(int rij, vector<pair<int, int>> &plaatsing);
   bool kanContainerInRijPlaatsen(vector<pair <int,int>> &plaatsing);
-  /* Berekent voor elke k met 1 <= k <= K en voor elke i en j
-  met 1 <= i <= j <= N de waarde kraankosten (k, i, j): de
-  totale operationele kosten voor kraan k om containers i tot
-  en met j op hun plaats te zetten */
-  double kraanKostenBerekenen(int c1, int c2, int kraan);
-
-  /* Berekent de totaalkosten(k,j), welke de minimale kosten
-  zijn om met kranen 1 tot en met k containers 1 tot en met j
-  op hun plaats te zetten volgens de regels uit de specificatie.
-    - totaalkosten(k,j) is dus de oplossing voor het deelprobleem
-    met de eerste k kranen en de eerste j containers
-    - Ook gedefinieerd voor k = 0 en j = 0
-    - Niet per se nodig dat alle k kranen worden gebruikt
-    - Zoeken uiteindelijke totaalkosten (K, N).
-    - Bereken waardes totaalkosten(k,j) met dynamisch programmeren
-    in een recursieve formulering waaraan tk(k,j) voldoet!
-    - Oftewel, druk waarde uit in kleinere deelproblemen
-      o totaalkosten(k',j') met k' < k en/of j' < j.
-      o kan gebruik maken van rijkosten(.) en kraankosten(.)
-    - Hint: gebruiken we kraan k wel of niet? Indien wel, welke
-    containers allemaal samen met container j in de laatste rij
-    van de oplossing staan. Wat zijn de totale kosten bij elke
-    mogelijkheid?
-   */
-  double totaalKosten(int k, int j);
-
-
-  double reccRoel();
-  double reccRoelStartRij(int j, int k);
-  double reccRoelHalverwegeRij(int j, int k, int delta);
-  void containerPlaatsenRij();
-
-
-// TODO: uw eigen private memberfuncties en membervariabelen
 
 };
 
