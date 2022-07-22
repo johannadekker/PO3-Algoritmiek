@@ -128,6 +128,9 @@ class Haven
     double ogOpKosten;
     double bgOpKosten;
 
+
+
+
   private:
 /* Ingelezen parameters */
       int breedteHaven;
@@ -140,43 +143,35 @@ class Haven
 
   /* Toegevoegde variabelen */
         bool haveHaven;
+        double totaalKosten[MaxK][MaxN];
         pair<int, int> cachedKraanContainerParen[MaxN];
         int cachedRijKosten[MaxN];
 
-  /* Retourneert de waarde rijkosten(i,j): de rijkosten voor een rij bestaande uit
-  containers i tot en met j
-  - rijkosten = c · δ^2, waarbij δ de ruimte is over aan het eind van een rij en
-    c een ingelezen parameter
-  -  1 <= i <= j <= aantalContainers. i = 0 -> container 1
-  - i en j zijn geldig van 0 tot aantalContainers - 1, gebruiken indexposities
-  - ongeldige rijen returnen INT_MAX, i.e. te breed  */
-  int rijKosten(int i, int j);
-
-  /* Retourneert de totale operationele kosten voor kraan k om containers i tot en
-  met j op hun plaats te zetten.
-    - 0 <= k < aantalKranen
-    - bij ongeldige invoer returnt hij INT_MAX, i.e. kraan -1  */
-  double kraanKosten(int i, int j, int k);
-
-  /* Een recursieve hulpfunctie die de totaalkosten(k,j) retourneert voor een
-  container die als eerste op een rij wordt geplaatst. Evalueert twee keuzes:
-  container plaatsen met de huidige kraan, of met een hoger genummerde kraan
-  indien beschikbaar.
-  - 0 <= j < aantalContainers
-  - 0 <= k < aantalKranen */
+  /* Geeft de begincontainer bij de eindcontainer */
   double recStartRij(int j, int k);
-
-  /* Een recursieve hulpfunctie die de totaalkosten(k,j) retourneert voor een
-  container wanneer er al een container op de huidige rij staat. Evalueert twee
-  keuzes: aansluiten bij huidige rij, of een nieuwe rij beginnen.
-  - 0 <= i <= j < aantalContainers
-  - 0 <= k < aantalKranen     */
   double recHalverwegeRij(int i, int j, int k);
+  double tdStartRij(int j, int k);
+  double tdHalverwegeRij(int i, int j, int k);
 
+  /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
+  rijkosten(i,j): de rijkosten bestaande uit containers i tot
+  en met j
+    - als er aan het eind van een rij nog δ ruimte over is,
+    dan bedragen de rijkosten c · δ2 voor een constante c*/
+  int rijKosten(int beginContainer, int eindContainer);
 
+  /* Berekent voor elke k met 1 <= k <= K en voor elke i en j
+  met 1 <= i <= j <= N de waarde kraankosten (k, i, j): de
+  totale operationele kosten voor kraan k om containers i tot
+  en met j op hun plaats te zetten */
+  double kraanKosten(int c1, int c2, int kraan);
 
   int rijKostenRaw(int rij, vector<pair<int, int>> &plaatsing);
   bool kanContainerInRijPlaatsen(vector<pair <int,int>> &plaatsing);
+
+
+
+// TODO: uw eigen private memberfuncties en membervariabelen
 
 };
 
