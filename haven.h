@@ -143,7 +143,7 @@ class Haven
 
   /* Toegevoegde variabelen */
         bool haveHaven;
-        double totaalKosten[MaxK][MaxN];
+        double totaalKosten[MaxK][MaxN][MaxN];
         pair<int, int> cachedKraanContainerParen[MaxN];
         int cachedRijKosten[MaxN];
 

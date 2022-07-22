@@ -182,21 +182,6 @@ double Haven::recHalverwegeRij(int i, int j, int k) {
   return kostNaNieuweRij;
 } //recHalverwegeRij
 
-double Haven::recHalverwegeRij(int i, int j, int k) {
-  if (j >= aantalContainers) { //alle containers zijn geplaatst
-    return 0;
-  }
-
-  double kostNaNieuweRij = recStartRij(j, k) + rijKosten(i, j-1);
-
-  if (rijKosten(i, j) < INT_MAX) { //container past in rij
-    double kostNaAansluiten = kraanKosten(j, j, k) + recHalverwegeRij(i, j + 1, k);
-    return min(kostNaAansluiten, kostNaNieuweRij);
-    }
-  //als container niet past begin een nieuwe rij
-  return kostNaNieuweRij;
-} //recHalverwegeRij
-
 //*************************************************************************
 
 double Haven::bepaalMinKostenTD ()
@@ -208,24 +193,28 @@ double Haven::bepaalMinKostenTD ()
   cout << "BEFORE: " << endl;
   for (int k = 0; k < aantalKranen; k++) {
     for (int j = 0; j < aantalContainers; j++) {
-      cout << totaalKosten[k][k] << ' ';
-      if (j == aantalContainers - 1) {
-        cout << endl;
+      for (int i = 0; i < aantalContainers; i++) {
+        cout << totaalKosten[k][j][i] << ' ';
+        if (i == aantalContainers - 1) {
+          cout << endl;
+        }
       }
     }
   }
   tdStartRij(0,0);
+
   cout << "AFTER: " << endl;
   for (int k = 0; k < aantalKranen; k++) {
     for (int j = 0; j < aantalContainers; j++) {
-      cout << totaalKosten[k][k] << ' ';
-      if (j == aantalContainers - 1) {
-        cout << endl;
+      for (int i = 0; i < aantalContainers; i++) {
+        cout << totaalKosten[k][j][i] << ' ';
+        if (i == aantalContainers - 1) {
+          cout << endl;
+        }
       }
     }
   }
-
-  return totaalKosten[aantalKranen-1][aantalContainers-1];
+  return totaalKosten[0][0][0];
 }  // bepaalMinKostenTD
 
 //*************************************************************************
@@ -234,25 +223,20 @@ double Haven::tdStartRij(int j, int k) {
   if (j >= aantalContainers) {
     return 0;
   }
-  if (totaalKosten[k][j] > 0) {
-    double kostNaPlaatsen = totaalKosten[k][j];
+  if (totaalKosten[k][j][j] > 0) {
+    return totaalKosten[k][j][j];
   }
-  else {
-    double kostNaPlaatsen = kraanKosten(j, j, k) + tdHalverwegeRij(j, j + 1, k);
-  }
+
+  double kostNaPlaatsen = kraanKosten(j, j, k) + tdHalverwegeRij(j, j + 1, k);
+
   if (k < aantalKranen - 1) { //hoger genummerde kraan beschikbaar
-    if (totaalKosten[k+1][j] > 0) {
-      double kostNaNieuweKraan = totaalKosten[k+1][j];
-    }
-    else {
-      double kostNaNieuweKraan = recStartRij(j, k + 1);
+      double kostNaNieuweKraan = tdStartRij(j, k + 1);
       //lagere kosten bij inzetten hogere kraan
-      totaalKosten[k][j] = min(kostNaPlaatsen, kostNaNieuweKraan);
-      return totaalKosten[k][j];
+      totaalKosten[k][j][j] = min(kostNaPlaatsen, kostNaNieuweKraan);
+      return totaalKosten[k][j][j];
     }
-  }
-  totaalKosten[k][j] = kostenNaPlaatsen;
-  return totaalKosten[k][j];
+    totaalKosten[k][j][j] = kostNaPlaatsen;
+    return totaalKosten[k][j][j];
 } //tdStartRij
 
 //*************************************************************************
@@ -261,20 +245,20 @@ double Haven::tdHalverwegeRij(int i, int j, int k) {
   if (j >= aantalContainers) { //alle containers zijn geplaatst
     return 0;
   }
-  if (totaalKosten[k][j] > 0) {
-    return totaalKosten[k][j];
+  if (totaalKosten[k][j][i] > 0) {
+    return totaalKosten[k][j][i];
   }
   else {
-    double kostNaNieuweRij = recStartRij(j, k) + rijKosten(i, j-1);
+    double kostNaNieuweRij = tdStartRij(j, k) + rijKosten(i, j-1);
 
     if (rijKosten(i, j) < INT_MAX) { //container past in rij
       double kostNaAansluiten = kraanKosten(j, j, k) + recHalverwegeRij(i, j + 1, k);
-      totaalKosten[k][j] = min(kostNaAansluiten, kostNaNieuweRij);
-      return totaalKosten[k][j];
+      totaalKosten[k][j][i] = min(kostNaAansluiten, kostNaNieuweRij);
+      return totaalKosten[k][j][i];
       }
     //als container niet past begin een nieuwe rij
-    totaalKosten[k][j] = kostNaNieuweRij;
-    return totaalKosten[k][j];
+    totaalKosten[k][j][i] = kostNaNieuweRij;
+    return totaalKosten[k][j][i];
   }
 } //recHalverwegeRij
 
