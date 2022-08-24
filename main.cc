@@ -15,6 +15,8 @@
 
 #include <iostream>
 #include <vector>
+#include <limits>
+#include <fstream>
 #include <ctime>  // voor clock() en clock_t
 #include "standaard.h"
 #include "haven.h"
@@ -100,6 +102,7 @@ void menuVoorInstantie (Haven *h1)
 // Voer de experimenten uit, zoals beschreven in de opdracht.
 void doeExperimenten ()
 { int keuze;
+  clock_t t1, t2;
 
   keuze = 0;
   while (keuze!=4)
@@ -108,11 +111,42 @@ void doeExperimenten ()
     cout << "Waarmee wilt u experimenten doen?" << endl;
     keuze = keuzeUitMenu ("de experimenten");
 
-// TODO: voer het experiment uit voor de gekozen methode
-// (rechtstreeks recursief, top-down DP of bottom-up DP)
+    if(keuze < 1 || keuze > 3) continue;
+    
+    // 4, 8, 16, .... 1024
+
+    cout << "  N  | ticks        | seconds      \n"
+         << "-----+--------------+--------------" << endl;
+
+
+
+
+    Haven* h1 = new Haven();
+    for(int N = 4; N <= 1024; N <<= 1) {
+      h1->genereerInstantie(100, N, 10, 50, 2, 1.0, N/2, 1.0, 10.0);      
+      t1 = clock ();
+      switch (keuze)
+      {
+      case 1: /* rechtstreeks recursief */
+        h1->bepaalMinKostenRec();
+        break;
+      case 2: /* TD */
+        h1->bepaalMinKostenTD();
+        break;
+      case 3: /* BU */
+        vector<pair<int,int>> plaatsing;
+        h1->bepaalMinKostenBU(plaatsing);
+        break;
+      }
+      t2 = clock ();
+      cout << setw(4) << N << " | " << setw(12) << (t2-t1) << " | " << setw(12) << (((double)(t2-t1))/CLOCKS_PER_SEC) << endl;
+  
+    }
+    delete h1;
 
   }  // while
 
+  
 }  // doeExperimenten
 
 //*************************************************************************

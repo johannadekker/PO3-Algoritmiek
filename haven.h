@@ -3,10 +3,15 @@
 #ifndef HavenHVar  // voorkom dat dit bestand meerdere keren
 #define HavenHVar  // ge-include wordt
 
+
+#define INF numeric_limits<double>::infinity()
+
 #include "constantes.h"
 #include <vector>
 #include <utility>  // lijkt soms nodig voor pair
 using namespace std;
+
+enum Actie { unknown, nieuwe_rij, container_plaatsen, nieuwe_kraan, klaar };
 
 class Haven
 { public:
@@ -133,25 +138,24 @@ class Haven
 
   private:
 /* Ingelezen parameters */
-      int breedteHaven;
-      int aantalContainers;
       int lengte[MaxN];
-      int vasteRuimte;
-      double rijKostenConstante;
-      int aantalKranen;
       double operationeleKosten[MaxK][MaxN];
 
   /* Toegevoegde variabelen */
-        bool haveHaven;
-        double totaalKosten[MaxK][MaxN][MaxN];
-        pair<int, int> cachedKraanContainerParen[MaxN];
-        int cachedRijKosten[MaxN];
+    bool haveHaven;
+    double totaalKosten[MaxK][MaxN][MaxN];
+
+    double tableBU[MaxN][MaxN][MaxK];
+    Actie actionTableBU[MaxN][MaxN][MaxK];
+
+    pair<int, int> cachedKraanContainerParen[MaxN];
+    int cachedRijKosten[MaxN];
 
   /* Geeft de begincontainer bij de eindcontainer */
-  double recStartRij(int j, int k);
-  double recHalverwegeRij(int i, int j, int k);
-  double tdStartRij(int j, int k);
-  double tdHalverwegeRij(int i, int j, int k);
+    double recStartRij(int j, int k);
+    double recHalverwegeRij(int i, int j, int k);
+    double tdStartRij(int j, int k);
+    double tdHalverwegeRij(int i, int j, int k);
 
   /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
   rijkosten(i,j): de rijkosten bestaande uit containers i tot
@@ -169,9 +173,10 @@ class Haven
   int rijKostenRaw(int rij, vector<pair<int, int>> &plaatsing);
   bool kanContainerInRijPlaatsen(vector<pair <int,int>> &plaatsing);
 
+  int rijBreedte(int van, int tot);
+  int ruimteOver(int van, int tot);
+  double rijKosten2(int van, int tot);
 
-
-// TODO: uw eigen private memberfuncties en membervariabelen
 
 };
 
