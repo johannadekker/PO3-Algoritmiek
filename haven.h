@@ -11,6 +11,8 @@
 #include <utility>  // lijkt soms nodig voor pair
 using namespace std;
 
+// Deze klasse wordt gebruikt voor het bijhouden van de paren (k, i)
+// zijn die leiden tot totaalkosten(K, N).,
 enum Actie { unknown, nieuwe_rij, container_plaatsen, nieuwe_kraan, klaar };
 
 class Haven
@@ -157,12 +159,15 @@ class Haven
     double tdStartRij(int j, int k);
     double tdHalverwegeRij(int i, int j, int k);
 
+
+  int rijBreedte(int van, int tot);
+  int ruimteOver(int van, int tot);
   /* Berekent voor elke i en j met 1 <= i <= j <= N de waarde
   rijkosten(i,j): de rijkosten bestaande uit containers i tot
   en met j
     - als er aan het eind van een rij nog δ ruimte over is,
     dan bedragen de rijkosten c · δ2 voor een constante c*/
-  int rijKosten(int beginContainer, int eindContainer);
+  double rijKosten(int van, int tot);
 
   /* Berekent voor elke k met 1 <= k <= K en voor elke i en j
   met 1 <= i <= j <= N de waarde kraankosten (k, i, j): de
@@ -173,9 +178,6 @@ class Haven
   int rijKostenRaw(int rij, vector<pair<int, int>> &plaatsing);
   bool kanContainerInRijPlaatsen(vector<pair <int,int>> &plaatsing);
 
-  int rijBreedte(int van, int tot);
-  int ruimteOver(int van, int tot);
-  double rijKosten2(int van, int tot);
 
 
 };

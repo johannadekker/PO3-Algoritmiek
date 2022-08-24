@@ -118,9 +118,6 @@ void doeExperimenten ()
     cout << "  N  | ticks        | seconds      \n"
          << "-----+--------------+--------------" << endl;
 
-
-
-
     Haven* h1 = new Haven();
     for(int N = 4; N <= 1024; N <<= 1) {
       h1->genereerInstantie(100, N, 10, 50, 2, 1.0, N/2, 1.0, 10.0);      
@@ -145,8 +142,6 @@ void doeExperimenten ()
     delete h1;
 
   }  // while
-
-  
 }  // doeExperimenten
 
 //*************************************************************************
